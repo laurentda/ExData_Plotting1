@@ -1,7 +1,7 @@
 #read household_power_consumption.txt file into R
 data <- read.table("household_power_consumption.txt", sep = ";", header=TRUE)
 
-
+#
 #69518-66637 = 2881
 
 #calculate 
