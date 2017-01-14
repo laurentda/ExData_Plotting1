@@ -1,21 +1,27 @@
+#read data into R
+#Note that in this dataset missing values are coded as ?.
+data <- read.table(file = "household_power_consumption.txt", sep=";", header=TRUE, na.strings = "?")
 
-#read household_power_consumption.txt file into R
-data <- read.table("household_power_consumption.txt", sep = ";", header=TRUE, na.strings = "?")
+#We will only be using data from the dates 2007-02-01 and 2007-02-02. One alternative is to read the data from just those dates rather than reading in the entire dataset and subsetting to those dates.
+#subset data with Date 2007-02-01 | 2007-02-02
+data2 <- data[grep("^2007-02-01|^2007-02-02", data$Date), ]
 
-#subset data
-datas <- data[grep("^1/2/2007$|^2/2/2007$",data$Date),]
-#no space in between arguments of grep, not working if not
+#You may find it useful to convert the Date and Time variables to Date/Time classes in R using the strptime()  and as.Date() functions.
+library(lubridate)
+data$Date <- dmy(data$Date)
+data$Time <- hms(data$Time)
 
-#convert Date and Time to Date class and store it in Date col
-datas$Date <- strptime(paste(datas$Date, datas$Time), "%d/%m/%Y %H:%M:%S")
+#clear space by removing original dataset
+rm(data)
 
-#plot the lot
-#use Sub_metering_1 Sub_metering_2 Sub_metering_3
+#transform Global_active_power to numeric
+data2$Global_active_power <- as.numeric(as.character(data2$Global_active_power))
+
+#plot3
 png(filename = "plot3.png", width = 480, height = 480, units = "px", pointsize = 12, bg = "white", res = 72, antialias = "none")
-plot(datas$Sub_metering_1, xaxt = "n", type="l", ylab = "Energy sub metering", xlab = "")
-axis(1, at = c(1, length(datas$Date)/2, length(datas$Date)), labels = c("Thur.", "Fri.", "Sat."), las = 0)
-lines(datas$Sub_metering_2, type = "l", col ="red")
-lines(datas$Sub_metering_3, type = "l", col = "blue")
-legend("topright", lty = 1, col = c("black", "red", "blue"), legend = names(datas[7:9]))
+plot(data2$Sub_metering_1, xaxt = "n", type="l", ylab = "Energy sub metering", xlab = "")
+axis(1, at = c(1, length(data2$Date)/2, length(data2$Date)), labels = c("Thur.", "Fri.", "Sat."), las = 0)
+lines(data2$Sub_metering_2, type = "l", col ="red")
+lines(data2$Sub_metering_3, type = "l", col = "blue")
+legend("topright", lty = 1, col = c("black", "red", "blue"), legend = names(data2[7:9]))
 dev.off()
-

@@ -1,25 +1,23 @@
-#read household_power_consumption.txt file into R
-data <- read.table("household_power_consumption.txt", sep = ";", header=TRUE)
+#read data into R
+#Note that in this dataset missing values are coded as ?.
+data <- read.table(file = "household_power_consumption.txt", sep=";", header=TRUE, na.strings = "?")
 
-#
-#69518-66637 = 2881
+#We will only be using data from the dates 2007-02-01 and 2007-02-02. One alternative is to read the data from just those dates rather than reading in the entire dataset and subsetting to those dates.
+#subset data with Date 2007-02-01 | 2007-02-02
+data2 <- data[grep("^2007-02-01|^2007-02-02", data$Date), ]
 
-#calculate 
-#2075260 rows / 9 columns
-(2075260*9*8)/2^20
-#142.4968 MB
-
-#reduce the dat set to the required rows
-datas <- data[66637:69516,]
-
+#You may find it useful to convert the Date and Time variables to Date/Time classes in R using the strptime()  and as.Date() functions.
 library(lubridate)
-#change Date to date
-datas$Date <- dmy(datas$Date)
-# change Time to date
-datas$Time <- hms(datas$Time)
+data$Date <- dmy(data$Date)
+data$Time <- hms(data$Time)
 
-#create histogramm and save it to file plot1.png
-png(filename = "plot1.png", width = 480, height = 480, units = "px", pointsize = 12, bg = "white", res = 72, antialias = "none")
-hist(as.numeric(datas$Global_active_power)/1000, main = "Global Active Power", col= "red", xlab = "Global Active Power (kilowatts)", ylab = "Frequency")
-#title(main = "Global Active Power")
+#clear space by removing original dataset
+rm(data)
+
+#transform Global_active_power to numeric
+data2$Global_active_power <- as.numeric(as.character(data2$Global_active_power))
+
+#plot1
+png(file = "plot1.png", width=480, height=480)
+hist(data2$Global_active_power, col = "red", xlab = "Global Active Power (kilowatt)", main = "GLobal Active Power")
 dev.off()
